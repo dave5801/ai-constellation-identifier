@@ -67,6 +67,29 @@ def _encode_image(image: np.ndarray) -> str:
     return base64.b64encode(encoded.tobytes()).decode("utf-8")
 
 
+def _draw_constellation_outline(
+    image: np.ndarray,
+    match: MatchResult,
+    color: tuple[int, int, int],
+) -> None:
+    points = np.array(match.transformed_points, dtype=np.float32)
+    if len(points) < 3:
+        return
+
+    hull = cv2.convexHull(points.astype(np.int32))
+    cv2.polylines(image, [hull], isClosed=True, color=color, thickness=2, lineType=cv2.LINE_AA)
+
+    x, y, width, height = cv2.boundingRect(hull)
+    cv2.rectangle(
+        image,
+        (x, y),
+        (x + width, y + height),
+        color,
+        1,
+        cv2.LINE_AA,
+    )
+
+
 def _draw_annotations(
     image: np.ndarray,
     detection: DetectionResult,
@@ -95,6 +118,8 @@ def _draw_annotations(
 
     for match in matches:
         color = tuple(int(channel) for channel in match.color)
+        _draw_constellation_outline(annotated, match, color)
+
         for start_idx, end_idx in match.connections:
             start = tuple(int(round(value)) for value in match.transformed_points[start_idx])
             end = tuple(int(round(value)) for value in match.transformed_points[end_idx])
