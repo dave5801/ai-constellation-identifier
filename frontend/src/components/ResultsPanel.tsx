@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import type { IdentifyResponse } from "../lib/types";
 
 type ResultsPanelProps = {
@@ -25,6 +27,8 @@ function ConfidenceBar({ confidence }: { confidence: number }) {
 }
 
 export function ResultsPanel({ result, isLoading, error }: ResultsPanelProps) {
+  const [zoomPercent, setZoomPercent] = useState(100);
+
   return (
     <section className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-panel backdrop-blur md:p-7">
       <div className="flex items-center justify-between">
@@ -51,12 +55,35 @@ export function ResultsPanel({ result, isLoading, error }: ResultsPanelProps) {
 
       {result ? (
         <div className="mt-6 grid gap-5 xl:grid-cols-[1.45fr_0.95fr]">
-          <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-night-900/80">
-            <img
-              src={`data:image/png;base64,${result.annotated_image}`}
-              alt="Annotated constellation analysis"
-              className="h-full w-full object-cover"
-            />
+          <div className="rounded-[1.5rem] border border-white/10 bg-night-900/80">
+            <div className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3">
+              <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Annotated Image</p>
+              <div className="flex items-center gap-3">
+                <label htmlFor="zoom" className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  Zoom
+                </label>
+                <input
+                  id="zoom"
+                  type="range"
+                  min={50}
+                  max={200}
+                  step={10}
+                  value={zoomPercent}
+                  onChange={(event) => setZoomPercent(Number(event.target.value))}
+                  className="w-28 accent-aurora"
+                />
+                <span className="w-12 text-right text-sm text-slate-300">{zoomPercent}%</span>
+              </div>
+            </div>
+
+            <div className="max-h-[720px] overflow-auto p-4">
+              <img
+                src={`data:image/png;base64,${result.annotated_image}`}
+                alt="Annotated constellation analysis"
+                className="h-auto max-w-none rounded-xl"
+                style={{ width: `${zoomPercent}%` }}
+              />
+            </div>
           </div>
 
           <div className="space-y-4">
