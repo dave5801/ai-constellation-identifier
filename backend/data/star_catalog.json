@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Orion",
+    "color": [64, 224, 208],
+    "stars": [
+      {"name": "Bellatrix", "ra_deg": 81.2828, "dec_deg": 6.3497, "mag": 1.64},
+      {"name": "Betelgeuse", "ra_deg": 88.7929, "dec_deg": 7.4071, "mag": 0.42},
+      {"name": "Meissa", "ra_deg": 83.7845, "dec_deg": 9.9342, "mag": 3.39},
+      {"name": "Mintaka", "ra_deg": 83.0017, "dec_deg": -0.2991, "mag": 2.25},
+      {"name": "Alnilam", "ra_deg": 84.0534, "dec_deg": -1.2019, "mag": 1.69},
+      {"name": "Alnitak", "ra_deg": 85.1897, "dec_deg": -1.9426, "mag": 1.74},
+      {"name": "Saiph", "ra_deg": 86.9391, "dec_deg": -9.6696, "mag": 2.07},
+      {"name": "Rigel", "ra_deg": 78.6345, "dec_deg": -8.2016, "mag": 0.13}
+    ],
+    "connections": [[0, 2], [2, 1], [0, 3], [3, 4], [4, 5], [5, 6], [4, 7]]
+  },
+  {
+    "name": "Ursa Major (Big Dipper)",
+    "color": [0, 215, 255],
+    "stars": [
+      {"name": "Dubhe", "ra_deg": 165.9320, "dec_deg": 61.7510, "mag": 1.79},
+      {"name": "Merak", "ra_deg": 165.4603, "dec_deg": 56.3824, "mag": 2.37},
+      {"name": "Phecda", "ra_deg": 178.4577, "dec_deg": 53.6948, "mag": 2.43},
+      {"name": "Megrez", "ra_deg": 183.8565, "dec_deg": 57.0326, "mag": 3.31},
+      {"name": "Alioth", "ra_deg": 193.5073, "dec_deg": 55.9598, "mag": 1.76},
+      {"name": "Mizar", "ra_deg": 200.9814, "dec_deg": 54.9254, "mag": 2.23},
+      {"name": "Alkaid", "ra_deg": 206.8852, "dec_deg": 49.3133, "mag": 1.85}
+    ],
+    "connections": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]]
+  },
+  {
+    "name": "Cassiopeia",
+    "color": [147, 20, 255],
+    "stars": [
+      {"name": "Caph", "ra_deg": 2.2945, "dec_deg": 59.1498, "mag": 2.28},
+      {"name": "Schedar", "ra_deg": 10.1260, "dec_deg": 56.5373, "mag": 2.24},
+      {"name": "Gamma Cassiopeiae", "ra_deg": 14.1771, "dec_deg": 60.7167, "mag": 2.15},
+      {"name": "Ruchbah", "ra_deg": 21.4539, "dec_deg": 60.2353, "mag": 2.68},
+      {"name": "Segin", "ra_deg": 28.5989, "dec_deg": 63.6701, "mag": 3.35}
+    ],
+    "connections": [[0, 1], [1, 2], [2, 3], [3, 4]]
+  },
+  {
+    "name": "Scorpius",
+    "color": [50, 205, 50],
+    "stars": [
+      {"name": "Acrab", "ra_deg": 241.3593, "dec_deg": -19.8054, "mag": 2.62},
+      {"name": "Dschubba", "ra_deg": 240.0834, "dec_deg": -22.6217, "mag": 2.29},
+      {"name": "Antares", "ra_deg": 247.3519, "dec_deg": -26.4320, "mag": 1.06},
+      {"name": "Tau Scorpii", "ra_deg": 248.9706, "dec_deg": -28.2160, "mag": 2.82},
+      {"name": "Epsilon Scorpii", "ra_deg": 252.5409, "dec_deg": -34.2932, "mag": 2.29},
+      {"name": "Mu Scorpii", "ra_deg": 252.9678, "dec_deg": -38.0474, "mag": 2.89},
+      {"name": "Lesath", "ra_deg": 262.6911, "dec_deg": -37.2958, "mag": 2.70},
+      {"name": "Shaula", "ra_deg": 263.4022, "dec_deg": -37.1038, "mag": 1.62}
+    ],
+    "connections": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]]
+  }
+]
