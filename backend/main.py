@@ -13,10 +13,10 @@ from PIL import Image
 from pydantic import BaseModel
 
 from vision.constellation_match import ConstellationMatcher, MatchResult
+from vision.catalog import load_star_catalog
 from vision.models import DetectionResult
 from vision.preprocess import preprocess_image
 from vision.star_detection import detect_stars
-from vision.templates import load_constellation_templates
 
 
 class ConstellationResponse(BaseModel):
@@ -32,9 +32,9 @@ class IdentifyResponse(BaseModel):
 
 
 BASE_DIR = Path(__file__).resolve().parent
-TEMPLATE_PATH = BASE_DIR / "data" / "constellation_templates.json"
+CATALOG_PATH = BASE_DIR / "data" / "star_catalog.json"
 
-matcher = ConstellationMatcher(load_constellation_templates(TEMPLATE_PATH))
+matcher = ConstellationMatcher(load_star_catalog(CATALOG_PATH))
 
 app = FastAPI(title="AI Constellation & Object Identifier", version="1.0.0")
 
