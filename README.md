@@ -20,7 +20,7 @@ ai-constellation-identifier/
 
 ## Features
 
-- FastAPI backend with image upload, preprocessing, blob-based star detection, constellation pattern matching, possible bright-object detection, and base64 annotated image output
+- FastAPI backend with image upload, preprocessing, blob-based star detection, catalog-based star-field matching, possible bright-object detection, and base64 annotated image output
 - React + TypeScript + Tailwind frontend with drag-and-drop upload, image preview, responsive layout, loading state, confidence bars, and annotated result display
 - Local-development CORS enabled for Vite and common localhost ports
 - Optional backend Dockerfile and `.env.example` files for local configuration
@@ -139,13 +139,16 @@ Example response:
 3. Isolate bright points with thresholding and morphological cleanup
 4. Detect stars with OpenCV `SimpleBlobDetector`
 5. Flag unusually bright large blobs as possible planets
-6. Match candidate stars against normalized templates for Orion, Ursa Major, Cassiopeia, and Scorpius using triangle signatures and affine/RANSAC fitting
-7. Return structured JSON and an annotated PNG overlay
+6. Project a local bright-star catalog for Orion, Ursa Major, Cassiopeia, and Scorpius into a normalized sky field using `astropy`
+7. Seed candidate alignments with triangle-signature matching and affine fitting
+8. Score alignments using geometric residuals, catalog coverage, and brightness consistency with `scikit-learn` nearest-neighbor matching
+9. Return structured JSON and an annotated PNG overlay
 
 ## Production Notes
 
 - The backend uses in-memory processing only and does not persist uploaded images.
-- Pattern matching is template-based rather than plate-solving; best results come from clear images focused on one supported constellation region.
+- Matching is catalog-based rather than full plate-solving; best results come from clear images focused on one supported constellation region.
+- Backend scientific dependencies now include `astropy` for sky-coordinate projection and `scikit-learn` for nearest-neighbor match scoring.
 - For deployment, pin dependency versions and serve the built frontend from a static host or reverse proxy.
 
 ## Optional Docker Run

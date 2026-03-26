@@ -14,8 +14,9 @@ from annotation import draw_annotations, encode_image
 from api_models import ConstellationResponse, IdentifyResponse
 from vision.constellation_match import ConstellationMatcher
 from vision.catalog import load_star_catalog
+from vision.models import DetectionResult
 from vision.preprocess import preprocess_image
-from vision.star_detection import detect_stars
+from vision.star_detection import detect_stars, find_possible_planets
 
 BASE_DIR = Path(__file__).resolve().parent
 CATALOG_PATH = BASE_DIR / "data" / "star_catalog.json"
@@ -62,7 +63,11 @@ async def identify(file: UploadFile = File(...)) -> JSONResponse:
 
     image_array = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     processed = preprocess_image(image_array)
-    detection = detect_stars(processed)
+    stars = detect_stars(processed["grayscale"])
+    detection = DetectionResult(
+        stars=stars,
+        possible_planets=find_possible_planets(stars),
+    )
     matches = matcher.match(detection.stars, image_array.shape[1], image_array.shape[0])
     annotated = draw_annotations(image_array, detection, matches)
     annotated_b64 = encode_image(annotated)
