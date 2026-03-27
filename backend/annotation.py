@@ -42,7 +42,7 @@ def draw_constellation_outline(
 def draw_detected_stars(image: np.ndarray, detection: DetectionResult) -> None:
     for star in detection.stars:
         center = (int(round(star["x"])), int(round(star["y"])))
-        radius = max(3, int(round(star["size"] / 2)))
+        radius = 2 + int(round(star.get("confidence", 0.5) * 2))
         cv2.circle(image, center, radius, (0, 255, 255), 1)
 
 

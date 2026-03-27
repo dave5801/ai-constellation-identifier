@@ -1,0 +1,14 @@
+[
+  {
+    "image": "orion.png",
+    "expected_constellation": "Orion"
+  },
+  {
+    "image": "cygnus.png",
+    "expected_constellation": "Cygnus"
+  },
+  {
+    "image": "taurus.png",
+    "expected_constellation": "Taurus"
+  }
+]
