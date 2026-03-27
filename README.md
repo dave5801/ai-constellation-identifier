@@ -20,7 +20,8 @@ ai-constellation-identifier/
 
 ## Features
 
-- FastAPI backend with image upload, preprocessing, blob-based star detection, catalog-based star-field matching, possible bright-object detection, and base64 annotated image output
+- FastAPI backend with image upload, preprocessing, hybrid local-maxima/LoG star detection, catalog-based star-field matching, possible bright-object detection, and base64 annotated image output
+- Curated catalog support for 19 constellations: Orion, Ursa Major (Big Dipper), Cassiopeia, Scorpius, Leo, Cygnus, Lyra, Aquila, Taurus, Gemini, Canis Major, Canis Minor, Pegasus, Andromeda, Sagittarius, Auriga, Virgo, Bootes, and Piscis Austrinus
 - React + TypeScript + Tailwind frontend with drag-and-drop upload, image preview, responsive layout, loading state, confidence bars, and annotated result display
 - Local-development CORS enabled for Vite and common localhost ports
 - Optional backend Dockerfile and `.env.example` files for local configuration
@@ -109,6 +110,10 @@ Returns:
 ### `POST /identify`
 
 Accepts multipart form data with an image file under the `file` field.
+Optional query parameter:
+
+- `debug=true`
+  Returns detector internals and per-constellation score summaries in the response.
 
 Example response:
 
@@ -132,17 +137,74 @@ Example response:
 }
 ```
 
+When `debug=true`, the response also includes:
+
+```json
+{
+  "debug": {
+    "detected_stars": [],
+    "raw_candidates": [],
+    "filtered_candidates": [],
+    "catalog_scores": []
+  }
+}
+```
+
+Each `catalog_scores` entry includes the cluster being evaluated plus diagnostic fields such as:
+
+- `cluster_id`
+- `matched_star_count`
+- `geometric_score`
+- `coverage_score`
+- `brightness_score`
+- `compatibility_score`
+- `rejection_reason`
+
 ## Detection Pipeline
 
 1. Convert uploaded images to grayscale
-2. Apply Gaussian blur and CLAHE contrast enhancement
-3. Isolate bright points with thresholding and morphological cleanup
-4. Detect stars with OpenCV `SimpleBlobDetector`
-5. Flag unusually bright large blobs as possible planets
-6. Project a local bright-star catalog for Orion, Ursa Major, Cassiopeia, and Scorpius into a normalized sky field using `astropy`
-7. Seed candidate alignments with triangle-signature matching and affine fitting
-8. Score alignments using geometric residuals, catalog coverage, and brightness consistency with `scikit-learn` nearest-neighbor matching
-9. Return structured JSON and an annotated PNG overlay
+2. Apply Gaussian blur, CLAHE contrast enhancement, thresholding, and morphological cleanup
+3. Detect star candidates with a hybrid local-maxima and LoG-style pipeline
+4. Rank and refine star candidates with subpixel centroids and confidence scoring
+5. Flag unusually bright stars as possible planets
+6. Cluster detected stars into local sky fields before matching
+7. Project the curated bright-star catalog into a normalized sky field using `astropy`
+8. Seed candidate alignments with triangle-signature matching and affine fitting
+9. Score alignments using compatibility, geometric residuals, catalog coverage, and brightness consistency with `scikit-learn` nearest-neighbor matching
+10. Return structured JSON and an annotated PNG overlay
+
+## Testing
+
+Backend tests cover:
+
+- catalog integrity checks
+- synthetic matcher checks
+- regression checks against selected images in `sample_images/`
+- debug response shape checks
+- sample evaluation workflow checks
+
+Run them with:
+
+```bash
+cd backend
+PYTHONPATH=. .venv/bin/python -m unittest discover -s tests -v
+```
+
+## Evaluation Workflow
+
+To run the backend pipeline over the labeled sample set and inspect recognition quality:
+
+```bash
+cd backend
+PYTHONPATH=. .venv/bin/python evaluate_samples.py
+```
+
+Expected sample labels live in `backend/data/sample_expectations.json`. The report includes:
+
+- detected star count
+- accepted constellation matches
+- top catalog scores
+- whether the expected constellation appears in the returned matches
 
 ## Production Notes
 

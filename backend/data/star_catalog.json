@@ -54,5 +54,192 @@
       {"name": "Shaula", "ra_deg": 263.4022, "dec_deg": -37.1038, "mag": 1.62}
     ],
     "connections": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]]
+  },
+  {
+    "name": "Leo",
+    "color": [255, 193, 7],
+    "stars": [
+      {"name": "Regulus", "ra_deg": 152.0929, "dec_deg": 11.9672, "mag": 1.36},
+      {"name": "Algieba", "ra_deg": 154.9931, "dec_deg": 19.8415, "mag": 2.01},
+      {"name": "Adhafera", "ra_deg": 154.1726, "dec_deg": 23.4173, "mag": 3.43},
+      {"name": "Rasalas", "ra_deg": 146.4628, "dec_deg": 23.7743, "mag": 3.88},
+      {"name": "Chertan", "ra_deg": 168.5271, "dec_deg": 15.4296, "mag": 3.34},
+      {"name": "Zosma", "ra_deg": 168.5600, "dec_deg": 20.5237, "mag": 2.56},
+      {"name": "Denebola", "ra_deg": 177.2649, "dec_deg": 14.5721, "mag": 2.14}
+    ],
+    "connections": [[0, 1], [1, 2], [2, 3], [1, 4], [4, 5], [5, 6]]
+  },
+  {
+    "name": "Cygnus",
+    "color": [135, 206, 250],
+    "stars": [
+      {"name": "Deneb", "ra_deg": 310.3579, "dec_deg": 45.2803, "mag": 1.25},
+      {"name": "Sadr", "ra_deg": 305.5571, "dec_deg": 40.2567, "mag": 2.23},
+      {"name": "Albireo", "ra_deg": 292.6803, "dec_deg": 27.9597, "mag": 3.18},
+      {"name": "Gienah", "ra_deg": 305.2528, "dec_deg": 33.9703, "mag": 2.48},
+      {"name": "Delta Cygni", "ra_deg": 296.2437, "dec_deg": 45.1308, "mag": 2.87},
+      {"name": "Epsilon Cygni", "ra_deg": 311.5528, "dec_deg": 33.9704, "mag": 2.46}
+    ],
+    "connections": [[0, 1], [1, 2], [1, 3], [1, 4], [1, 5]]
+  },
+  {
+    "name": "Lyra",
+    "color": [186, 104, 200],
+    "stars": [
+      {"name": "Vega", "ra_deg": 279.2347, "dec_deg": 38.7837, "mag": 0.03},
+      {"name": "Sheliak", "ra_deg": 281.4156, "dec_deg": 33.3627, "mag": 3.52},
+      {"name": "Sulafat", "ra_deg": 283.8163, "dec_deg": 32.6896, "mag": 3.24},
+      {"name": "Delta2 Lyrae", "ra_deg": 281.0710, "dec_deg": 36.8986, "mag": 4.30},
+      {"name": "Zeta Lyrae", "ra_deg": 283.1131, "dec_deg": 37.6047, "mag": 4.34}
+    ],
+    "connections": [[0, 3], [3, 1], [1, 2], [2, 4], [4, 0]]
+  },
+  {
+    "name": "Aquila",
+    "color": [255, 167, 38],
+    "stars": [
+      {"name": "Altair", "ra_deg": 297.6958, "dec_deg": 8.8683, "mag": 0.77},
+      {"name": "Alshain", "ra_deg": 298.8283, "dec_deg": 6.4068, "mag": 3.71},
+      {"name": "Tarazed", "ra_deg": 296.5651, "dec_deg": 10.6133, "mag": 2.72},
+      {"name": "Delta Aquilae", "ra_deg": 291.3740, "dec_deg": 3.1148, "mag": 3.36},
+      {"name": "Lambda Aquilae", "ra_deg": 286.3525, "dec_deg": -4.8825, "mag": 3.43},
+      {"name": "Theta Aquilae", "ra_deg": 302.8262, "dec_deg": -0.8215, "mag": 3.24}
+    ],
+    "connections": [[2, 0], [0, 1], [0, 3], [3, 4], [0, 5]]
+  },
+  {
+    "name": "Taurus",
+    "color": [255, 112, 67],
+    "stars": [
+      {"name": "Elnath", "ra_deg": 81.5729, "dec_deg": 28.6075, "mag": 1.65},
+      {"name": "Ain", "ra_deg": 67.1542, "dec_deg": 19.1804, "mag": 3.53},
+      {"name": "Aldebaran", "ra_deg": 68.9800, "dec_deg": 16.5093, "mag": 0.85},
+      {"name": "Hyadum I", "ra_deg": 65.7337, "dec_deg": 17.5426, "mag": 3.65},
+      {"name": "Hyadum II", "ra_deg": 64.9483, "dec_deg": 15.6277, "mag": 3.77},
+      {"name": "Zeta Tauri", "ra_deg": 84.4112, "dec_deg": 21.1426, "mag": 2.97}
+    ],
+    "connections": [[0, 5], [5, 2], [2, 1], [2, 3], [2, 4]]
+  },
+  {
+    "name": "Gemini",
+    "color": [244, 143, 177],
+    "stars": [
+      {"name": "Castor", "ra_deg": 113.6494, "dec_deg": 31.8883, "mag": 1.58},
+      {"name": "Pollux", "ra_deg": 116.3289, "dec_deg": 28.0262, "mag": 1.14},
+      {"name": "Wasat", "ra_deg": 110.0307, "dec_deg": 21.9823, "mag": 3.53},
+      {"name": "Mebsuta", "ra_deg": 99.4279, "dec_deg": 25.1311, "mag": 3.06},
+      {"name": "Mekbuda", "ra_deg": 106.0272, "dec_deg": 24.3977, "mag": 3.79},
+      {"name": "Alhena", "ra_deg": 99.4280, "dec_deg": 16.3993, "mag": 1.93}
+    ],
+    "connections": [[0, 2], [2, 4], [4, 5], [1, 2], [2, 3]]
+  },
+  {
+    "name": "Canis Major",
+    "color": [79, 195, 247],
+    "stars": [
+      {"name": "Mirzam", "ra_deg": 95.6749, "dec_deg": -17.9559, "mag": 1.98},
+      {"name": "Sirius", "ra_deg": 101.2872, "dec_deg": -16.7161, "mag": -1.46},
+      {"name": "Muliphein", "ra_deg": 107.0979, "dec_deg": -15.6333, "mag": 4.12},
+      {"name": "Wezen", "ra_deg": 104.6564, "dec_deg": -26.3932, "mag": 1.83},
+      {"name": "Adhara", "ra_deg": 104.0343, "dec_deg": -28.9721, "mag": 1.50},
+      {"name": "Aludra", "ra_deg": 111.0238, "dec_deg": -29.3031, "mag": 2.45}
+    ],
+    "connections": [[0, 1], [1, 2], [1, 3], [3, 4], [4, 5]]
+  },
+  {
+    "name": "Canis Minor",
+    "color": [255, 241, 118],
+    "stars": [
+      {"name": "Procyon", "ra_deg": 114.8255, "dec_deg": 5.2250, "mag": 0.34},
+      {"name": "Gomeisa", "ra_deg": 111.7877, "dec_deg": 8.2893, "mag": 2.89},
+      {"name": "Gamma Canis Minoris", "ra_deg": 115.3117, "dec_deg": 8.8843, "mag": 4.33}
+    ],
+    "connections": [[0, 1], [1, 2]]
+  },
+  {
+    "name": "Pegasus",
+    "color": [174, 213, 129],
+    "stars": [
+      {"name": "Markab", "ra_deg": 346.1900, "dec_deg": 15.2053, "mag": 2.49},
+      {"name": "Scheat", "ra_deg": 345.9436, "dec_deg": 28.0828, "mag": 2.42},
+      {"name": "Algenib", "ra_deg": 3.3089, "dec_deg": 15.1836, "mag": 2.84},
+      {"name": "Alpheratz", "ra_deg": 2.0969, "dec_deg": 29.0904, "mag": 2.06},
+      {"name": "Enif", "ra_deg": 333.4377, "dec_deg": 9.8750, "mag": 2.38}
+    ],
+    "connections": [[0, 1], [1, 3], [3, 2], [2, 0], [0, 4]]
+  },
+  {
+    "name": "Andromeda",
+    "color": [129, 199, 132],
+    "stars": [
+      {"name": "Alpheratz", "ra_deg": 2.0969, "dec_deg": 29.0904, "mag": 2.06},
+      {"name": "Mirach", "ra_deg": 17.4330, "dec_deg": 35.6206, "mag": 2.06},
+      {"name": "Almach", "ra_deg": 30.9748, "dec_deg": 42.3297, "mag": 2.10},
+      {"name": "Delta Andromedae", "ra_deg": 9.8320, "dec_deg": 30.8610, "mag": 3.28},
+      {"name": "Mu Andromedae", "ra_deg": 14.1881, "dec_deg": 38.4993, "mag": 3.86}
+    ],
+    "connections": [[0, 3], [3, 1], [1, 4], [4, 2]]
+  },
+  {
+    "name": "Sagittarius",
+    "color": [255, 204, 128],
+    "stars": [
+      {"name": "Kaus Borealis", "ra_deg": 276.0429, "dec_deg": -25.4217, "mag": 2.81},
+      {"name": "Nunki", "ra_deg": 283.8161, "dec_deg": -26.2967, "mag": 2.02},
+      {"name": "Ascella", "ra_deg": 290.9717, "dec_deg": -29.8281, "mag": 2.60},
+      {"name": "Kaus Media", "ra_deg": 272.4381, "dec_deg": -21.0236, "mag": 2.72},
+      {"name": "Kaus Australis", "ra_deg": 283.6620, "dec_deg": -34.3846, "mag": 1.79},
+      {"name": "Alnasl", "ra_deg": 271.4521, "dec_deg": -30.4241, "mag": 2.98},
+      {"name": "Phi Sagittarii", "ra_deg": 281.4143, "dec_deg": -26.9908, "mag": 3.17}
+    ],
+    "connections": [[0, 1], [1, 2], [0, 3], [3, 5], [5, 4], [1, 6], [6, 4]]
+  },
+  {
+    "name": "Auriga",
+    "color": [255, 245, 157],
+    "stars": [
+      {"name": "Capella", "ra_deg": 79.1723, "dec_deg": 45.9979, "mag": 0.08},
+      {"name": "Menkalinan", "ra_deg": 89.8822, "dec_deg": 44.9474, "mag": 1.90},
+      {"name": "Mahasim", "ra_deg": 89.9303, "dec_deg": 37.2126, "mag": 2.69},
+      {"name": "Almaaz", "ra_deg": 75.4922, "dec_deg": 43.8233, "mag": 2.65},
+      {"name": "Hassaleh", "ra_deg": 74.2484, "dec_deg": 41.0758, "mag": 2.66},
+      {"name": "Elnath", "ra_deg": 81.5729, "dec_deg": 28.6075, "mag": 1.65}
+    ],
+    "connections": [[0, 1], [1, 2], [2, 5], [5, 4], [4, 3], [3, 0]]
+  },
+  {
+    "name": "Virgo",
+    "color": [206, 147, 216],
+    "stars": [
+      {"name": "Spica", "ra_deg": 201.2983, "dec_deg": -11.1614, "mag": 0.98},
+      {"name": "Porrima", "ra_deg": 190.4152, "dec_deg": -1.4494, "mag": 2.74},
+      {"name": "Vindemiatrix", "ra_deg": 195.5442, "dec_deg": 10.9591, "mag": 2.83},
+      {"name": "Zavijava", "ra_deg": 177.6738, "dec_deg": 1.7647, "mag": 3.59},
+      {"name": "Heze", "ra_deg": 203.6733, "dec_deg": -8.5987, "mag": 3.38}
+    ],
+    "connections": [[3, 1], [1, 2], [1, 4], [4, 0]]
+  },
+  {
+    "name": "Bootes",
+    "color": [255, 138, 128],
+    "stars": [
+      {"name": "Arcturus", "ra_deg": 213.9153, "dec_deg": 19.1824, "mag": -0.05},
+      {"name": "Nekkar", "ra_deg": 221.2467, "dec_deg": 40.3906, "mag": 3.57},
+      {"name": "Seginus", "ra_deg": 221.2468, "dec_deg": 38.3074, "mag": 3.04},
+      {"name": "Izar", "ra_deg": 221.3648, "dec_deg": 27.0742, "mag": 2.37},
+      {"name": "Muphrid", "ra_deg": 208.6712, "dec_deg": 18.3986, "mag": 2.68}
+    ],
+    "connections": [[1, 2], [2, 3], [3, 0], [0, 4]]
+  },
+  {
+    "name": "Piscis Austrinus",
+    "color": [77, 208, 225],
+    "stars": [
+      {"name": "Fomalhaut", "ra_deg": 344.4128, "dec_deg": -29.6222, "mag": 1.16},
+      {"name": "Delta Piscis Austrini", "ra_deg": 340.1649, "dec_deg": -32.2531, "mag": 4.20},
+      {"name": "Epsilon Piscis Austrini", "ra_deg": 337.8761, "dec_deg": -27.0436, "mag": 4.17},
+      {"name": "Beta Piscis Austrini", "ra_deg": 337.4392, "dec_deg": -32.1725, "mag": 4.29}
+    ],
+    "connections": [[1, 0], [0, 2], [0, 3]]
   }
 ]

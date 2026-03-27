@@ -33,9 +33,8 @@ def estimate_affine_transform(
 ) -> tuple[AffineTransform | None, np.ndarray | None]:
     src = template_points[list(template_triangle)]
     dst = candidate_points[list(candidate_triangle)]
-
-    model = AffineTransform()
-    if not model.estimate(src, dst):
+    model = AffineTransform.from_estimate(src, dst)
+    if model is None:
         return None, None
 
     return model, np.ones(len(src), dtype=bool)
