@@ -3,6 +3,7 @@ from __future__ import annotations
 from vision.catalog_matching import evaluate_catalog_entry
 from vision.clustering import cluster_star_fields
 from vision.catalog_projection import catalog_star_magnitudes, project_catalog_stars
+from vision.catalog_matching import triangle_seed_indices_for_catalog
 from vision.geometry import iter_triangle_indices, normalize_points
 from vision.matcher_config import AMBIGUOUS_MATCH_SCORE_MARGIN, MATCHES_TO_RETURN
 from vision.models import CatalogMatchEvaluation, MatchResult, Star
@@ -16,7 +17,10 @@ class ConstellationMatcher:
                 "projected_points": project_catalog_stars(entry),
                 "magnitudes": catalog_star_magnitudes(entry),
                 "normalized_points": normalize_points(project_catalog_stars(entry)),
-                "triangles": iter_triangle_indices(len(entry["stars"])),
+                "seed_indices": triangle_seed_indices_for_catalog(catalog_star_magnitudes(entry)),
+                "triangles": iter_triangle_indices(
+                    len(triangle_seed_indices_for_catalog(catalog_star_magnitudes(entry)))
+                ),
             }
             for entry in catalog
         }
