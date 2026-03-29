@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import NearestNeighbors
 
+from vision.matcher_config import MAX_CLUSTER_COUNT, MAX_CLUSTER_STARS
 from vision.models import Star
 
 
@@ -27,10 +28,19 @@ def adaptive_cluster_radius(points: np.ndarray, width: int, height: int) -> floa
     return float(np.clip(reference_distance * 1.8, lower_bound, upper_bound))
 
 
-def cluster_rank(stars: list[Star]) -> tuple[float, float]:
+def cluster_compactness(stars: list[Star]) -> float:
+    if len(stars) < 2:
+        return 0.0
+    points = star_points(stars)
+    centered = points - np.mean(points, axis=0, keepdims=True)
+    radius = float(np.mean(np.linalg.norm(centered, axis=1)))
+    return 1.0 / max(radius, 1.0)
+
+
+def cluster_rank(stars: list[Star]) -> tuple[float, float, float]:
     mean_confidence = float(np.mean([star.get("confidence", 0.0) for star in stars])) if stars else 0.0
     mean_brightness = float(np.mean([star["brightness"] for star in stars])) if stars else 0.0
-    return mean_confidence, mean_brightness
+    return mean_confidence, cluster_compactness(stars), mean_brightness
 
 
 def cluster_star_fields(stars: list[Star], width: int, height: int) -> list[list[Star]]:
@@ -47,16 +57,13 @@ def cluster_star_fields(stars: list[Star], width: int, height: int) -> list[list
             continue
         cluster = [star for star, assigned in zip(stars, labels, strict=False) if assigned == label]
         if len(cluster) >= 3:
-            clusters.append(sorted(cluster, key=lambda star: star.get("confidence", 0.0), reverse=True))
+            ranked_cluster = sorted(cluster, key=lambda star: star.get("confidence", 0.0), reverse=True)
+            clusters.append(ranked_cluster[:MAX_CLUSTER_STARS])
 
     if not clusters:
         return [stars[: min(len(stars), 12)]]
 
     clusters.sort(key=cluster_rank, reverse=True)
-
-    fallback_cluster = stars[: min(len(stars), 12)]
-    if len(fallback_cluster) >= 3:
-        clusters.append(fallback_cluster)
 
     unique_clusters: list[list[Star]] = []
     seen_signatures: set[tuple[tuple[int, int], ...]] = set()
@@ -67,4 +74,4 @@ def cluster_star_fields(stars: list[Star], width: int, height: int) -> list[list
         seen_signatures.add(signature)
         unique_clusters.append(cluster)
 
-    return unique_clusters[:6]
+    return unique_clusters[:MAX_CLUSTER_COUNT]

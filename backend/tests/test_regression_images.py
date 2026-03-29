@@ -51,7 +51,10 @@ class RegressionImageTests(unittest.TestCase):
             self.assertIn("expected_constellation", entry)
 
     def test_sample_evaluation_workflow_returns_report_entries(self) -> None:
-        report = evaluate_sample_images(limit=1)
+        result = evaluate_sample_images(limit=1)
+        self.assertIn("summary", result)
+        self.assertIn("samples", result)
+        report = result["samples"]
         self.assertEqual(len(report), 1)
         for entry in report:
             self.assertIn("image", entry)
@@ -59,6 +62,7 @@ class RegressionImageTests(unittest.TestCase):
             self.assertIn("stars_detected", entry)
             self.assertIn("accepted_matches", entry)
             self.assertIn("top_catalog_scores", entry)
+            self.assertIn("top_prediction", entry)
             self.assertIn("expected_in_top_matches", entry)
 
 

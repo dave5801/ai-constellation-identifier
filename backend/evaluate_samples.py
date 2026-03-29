@@ -11,7 +11,7 @@ from vision.preprocess import preprocess_image
 from vision.star_detection import detect_stars
 
 
-def evaluate_sample_images(limit: int | None = None) -> list[dict]:
+def evaluate_sample_images(limit: int | None = None) -> dict[str, object]:
     backend_dir = Path(__file__).resolve().parent
     project_root = backend_dir.parent
     sample_manifest = json.loads((backend_dir / "data" / "sample_expectations.json").read_text(encoding="utf-8"))
@@ -39,6 +39,7 @@ def evaluate_sample_images(limit: int | None = None) -> list[dict]:
         evaluations = matcher.evaluate(stars, image.shape[1], image.shape[0])[:5]
 
         match_names = [match.name for match in matches]
+        top_prediction = evaluations[0].name if evaluations else None
         report.append(
             {
                 "image": item["image"],
@@ -58,11 +59,35 @@ def evaluate_sample_images(limit: int | None = None) -> list[dict]:
                     }
                     for evaluation in evaluations
                 ],
+                "top_prediction": top_prediction,
                 "expected_in_top_matches": item["expected_constellation"] in match_names,
+                "expected_is_top_prediction": item["expected_constellation"] == top_prediction,
             }
         )
 
-    return report
+    successes = sum(1 for entry in report if entry.get("expected_in_top_matches"))
+    top_prediction_hits = sum(1 for entry in report if entry.get("expected_is_top_prediction"))
+    confusion_counts: dict[str, int] = {}
+    for entry in report:
+        expected = entry.get("expected_constellation")
+        top_prediction = entry.get("top_prediction")
+        if expected and top_prediction and expected != top_prediction:
+            confusion_key = f"{expected} -> {top_prediction}"
+            confusion_counts[confusion_key] = confusion_counts.get(confusion_key, 0) + 1
+
+    summary = {
+        "sample_count": len(report),
+        "match_hit_count": successes,
+        "match_hit_rate": round(successes / max(len(report), 1), 3),
+        "top_prediction_hit_count": top_prediction_hits,
+        "top_prediction_hit_rate": round(top_prediction_hits / max(len(report), 1), 3),
+        "most_common_confusions": [
+            {"pair": pair, "count": count}
+            for pair, count in sorted(confusion_counts.items(), key=lambda item: item[1], reverse=True)[:5]
+        ],
+    }
+
+    return {"summary": summary, "samples": report}
 
 
 if __name__ == "__main__":

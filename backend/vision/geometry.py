@@ -4,7 +4,7 @@ from itertools import combinations
 from math import dist
 
 import numpy as np
-from skimage.transform import AffineTransform
+from skimage.transform import SimilarityTransform
 
 
 def normalize_points(points: np.ndarray) -> np.ndarray:
@@ -30,10 +30,10 @@ def estimate_affine_transform(
     template_triangle: tuple[int, int, int],
     candidate_points: np.ndarray,
     candidate_triangle: tuple[int, int, int],
-) -> tuple[AffineTransform | None, np.ndarray | None]:
+) -> tuple[SimilarityTransform | None, np.ndarray | None]:
     src = template_points[list(template_triangle)]
     dst = candidate_points[list(candidate_triangle)]
-    model = AffineTransform.from_estimate(src, dst)
+    model = SimilarityTransform.from_estimate(src, dst)
     if model is None:
         return None, None
 

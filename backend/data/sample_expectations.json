@@ -4,11 +4,55 @@
     "expected_constellation": "Orion"
   },
   {
+    "image": "orion1.png",
+    "expected_constellation": "Orion"
+  },
+  {
+    "image": "orion2.png",
+    "expected_constellation": "Orion"
+  },
+  {
+    "image": "orion3.png",
+    "expected_constellation": "Orion"
+  },
+  {
+    "image": "orion4.png",
+    "expected_constellation": "Orion"
+  },
+  {
+    "image": "orion5.png",
+    "expected_constellation": "Orion"
+  },
+  {
+    "image": "orion6.png",
+    "expected_constellation": "Orion"
+  },
+  {
     "image": "cygnus.png",
     "expected_constellation": "Cygnus"
   },
   {
+    "image": "cassopeia.png",
+    "expected_constellation": "Cassiopeia"
+  },
+  {
     "image": "taurus.png",
     "expected_constellation": "Taurus"
+  },
+  {
+    "image": "ursa_major.png",
+    "expected_constellation": "Ursa Major (Big Dipper)"
+  },
+  {
+    "image": "ursa_major2.png",
+    "expected_constellation": "Ursa Major (Big Dipper)"
+  },
+  {
+    "image": "leo1.png",
+    "expected_constellation": "Leo"
+  },
+  {
+    "image": "leo2.png",
+    "expected_constellation": "Leo"
   }
 ]

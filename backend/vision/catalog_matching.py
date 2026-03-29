@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
+from skimage.transform import SimilarityTransform
+from scipy.optimize import linear_sum_assignment
 
 from vision.catalog_projection import catalog_star_magnitudes, project_catalog_stars
 from vision.geometry import (
@@ -11,35 +12,57 @@ from vision.geometry import (
     triangle_signature,
 )
 from vision.matcher_config import (
-    AMBIGUOUS_MATCH_SCORE_MARGIN,
     ASPECT_RATIO_LOG_TOLERANCE,
     BRIGHT_STAR_COUNT_TOLERANCE,
     DETECTED_BRIGHTNESS_QUANTILE,
     LARGE_PATTERN_MIN_STARS,
-    MATCHES_TO_RETURN,
+    MEDIUM_PATTERN_MIN_STARS,
     MAX_CANDIDATE_STARS,
+    MAX_TRIANGLE_SEED_STARS,
+    MIN_COMPATIBILITY_SCORE,
+    MIN_LARGE_PATTERN_MATCHED_STARS,
     MIN_MATCH_COVERAGE,
     MIN_LARGE_PATTERN_COVERAGE,
+    MIN_MEDIUM_PATTERN_MATCHED_STARS,
     MIN_MATCH_SCORE,
     TRIANGLE_SIGNATURE_DISTANCE_LIMIT,
 )
 from vision.models import CatalogMatchEvaluation, MatchResult, Star
 
 
-def candidate_stars(stars: list[Star], limit: int = 30) -> list[Star]:
+def candidate_stars(stars: list[Star], limit: int = MAX_CANDIDATE_STARS) -> list[Star]:
     return stars[:limit]
 
 
-def candidate_points(stars: list[Star], limit: int = 30) -> np.ndarray:
+def candidate_points(stars: list[Star], limit: int = MAX_CANDIDATE_STARS) -> np.ndarray:
     if not stars:
         return np.empty((0, 2), dtype=np.float32)
     return np.array([[star["x"], star["y"]] for star in candidate_stars(stars, limit)], dtype=np.float32)
 
 
-def candidate_brightness(stars: list[Star], limit: int = 30) -> np.ndarray:
+def candidate_brightness(stars: list[Star], limit: int = MAX_CANDIDATE_STARS) -> np.ndarray:
     if not stars:
         return np.empty((0,), dtype=np.float32)
     return np.array([star["brightness"] for star in candidate_stars(stars, limit)], dtype=np.float32)
+
+
+def triangle_seed_indices_for_catalog(catalog_magnitudes: np.ndarray) -> list[int]:
+    if catalog_magnitudes.size <= MAX_TRIANGLE_SEED_STARS:
+        return list(range(int(catalog_magnitudes.size)))
+    ranked = np.argsort(catalog_magnitudes)
+    return [int(index) for index in ranked[:MAX_TRIANGLE_SEED_STARS]]
+
+
+def triangle_seed_indices_for_stars(stars: list[Star], limit: int = MAX_TRIANGLE_SEED_STARS) -> list[int]:
+    return list(range(min(len(stars), limit)))
+
+
+def required_matched_star_count(pattern_size: int) -> int:
+    if pattern_size >= LARGE_PATTERN_MIN_STARS:
+        return MIN_LARGE_PATTERN_MATCHED_STARS
+    if pattern_size >= MEDIUM_PATTERN_MIN_STARS:
+        return MIN_MEDIUM_PATTERN_MATCHED_STARS
+    return 3
 
 
 def magnitude_to_relative_flux(magnitudes: np.ndarray) -> np.ndarray:
@@ -58,31 +81,32 @@ def unique_nearest_neighbor_matches(
     transformed_catalog_points: np.ndarray,
     detected_points: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    neighbors = NearestNeighbors(n_neighbors=1)
-    neighbors.fit(detected_points)
-    distances, indices = neighbors.kneighbors(transformed_catalog_points)
+    if len(transformed_catalog_points) == 0 or len(detected_points) == 0:
+        return np.empty((0,), dtype=np.int32), np.empty((0,), dtype=np.int32)
 
-    pairings = sorted(
-        (
-            float(distance),
-            catalog_idx,
-            int(detected_idx),
-        )
-        for catalog_idx, (distance, detected_idx) in enumerate(zip(distances[:, 0], indices[:, 0], strict=False))
+    distance_matrix = np.linalg.norm(
+        transformed_catalog_points[:, None, :] - detected_points[None, :, :],
+        axis=2,
     )
+    catalog_indices, detected_indices = linear_sum_assignment(distance_matrix)
 
-    matched_catalog_indices: list[int] = []
-    matched_detected_indices: list[int] = []
-    used_detected: set[int] = set()
+    if len(catalog_indices) == 0:
+        return np.empty((0,), dtype=np.int32), np.empty((0,), dtype=np.int32)
 
-    for _, catalog_idx, detected_idx in pairings:
-        if detected_idx in used_detected:
-            continue
-        matched_catalog_indices.append(catalog_idx)
-        matched_detected_indices.append(detected_idx)
-        used_detected.add(detected_idx)
+    field_scale = max(np.linalg.norm(detected_points.std(axis=0)), 1.0)
+    max_distance = field_scale * 0.4
+    kept_pairs = [
+        (int(catalog_idx), int(detected_idx))
+        for catalog_idx, detected_idx in zip(catalog_indices, detected_indices, strict=False)
+        if distance_matrix[catalog_idx, detected_idx] <= max_distance
+    ]
+    if not kept_pairs:
+        return np.empty((0,), dtype=np.int32), np.empty((0,), dtype=np.int32)
 
-    return np.array(matched_catalog_indices, dtype=np.int32), np.array(matched_detected_indices, dtype=np.int32)
+    return (
+        np.array([catalog_idx for catalog_idx, _ in kept_pairs], dtype=np.int32),
+        np.array([detected_idx for _, detected_idx in kept_pairs], dtype=np.int32),
+    )
 
 
 def pattern_aspect_ratio(points: np.ndarray) -> float:
@@ -205,7 +229,7 @@ def score_catalog_alignment(
     detected_points: np.ndarray,
     catalog_magnitudes: np.ndarray,
     detected_brightness: np.ndarray,
-) -> tuple[float, float, float, float, int]:
+) -> tuple[float, float, float, float, int, np.ndarray, np.ndarray]:
     matched_catalog_indices, matched_detected_indices = unique_nearest_neighbor_matches(
         transformed_catalog_points,
         detected_points,
@@ -222,8 +246,16 @@ def score_catalog_alignment(
         matched_catalog_indices,
         matched_detected_indices,
     )
-    score = (geometric_score * 0.35) + (coverage_score * 0.45) + (brightness_score * 0.2)
-    return score, geometric_score, coverage_score, brightness_score, len(matched_catalog_indices)
+    score = (geometric_score * 0.3) + (coverage_score * 0.3) + (brightness_score * 0.4)
+    return (
+        score,
+        geometric_score,
+        coverage_score,
+        brightness_score,
+        len(matched_catalog_indices),
+        matched_catalog_indices,
+        matched_detected_indices,
+    )
 
 
 def evaluate_catalog_entry(
@@ -250,6 +282,23 @@ def evaluate_catalog_entry(
         catalog_points,
         catalog_magnitudes,
     )
+    if soft_compatibility < MIN_COMPATIBILITY_SCORE:
+        rejection_reason = rejection_reason or "low_compatibility"
+        return CatalogMatchEvaluation(
+            name=catalog_entry["name"],
+            confidence=soft_compatibility,
+            accepted=False,
+            cluster_id=cluster_id,
+            matched_star_count=0,
+            geometric_score=0.0,
+            coverage_score=0.0,
+            brightness_score=0.0,
+            compatibility_score=soft_compatibility,
+            rejection_reason=rejection_reason,
+            transformed_points=[],
+            connections=[tuple(connection) for connection in catalog_entry["connections"]],
+            color=tuple(catalog_entry.get("color", [255, 255, 255])),
+        )
     if early_reject_catalog_entry(image_points, detected_brightness, catalog_points, catalog_magnitudes):
         rejection_reason = rejection_reason or "early_rejection"
 
@@ -257,9 +306,17 @@ def evaluate_catalog_entry(
         prepared_catalog["normalized_points"] if prepared_catalog is not None else normalize_points(catalog_points)
     )
     catalog_triangles = (
-        prepared_catalog["triangles"] if prepared_catalog is not None else iter_triangle_indices(len(catalog_norm))
+        prepared_catalog["triangles"]
+        if prepared_catalog is not None
+        else iter_triangle_indices(len(triangle_seed_indices_for_catalog(catalog_magnitudes)))
     )
-    image_triangles = iter_triangle_indices(len(image_points))
+    catalog_seed_indices = (
+        prepared_catalog["seed_indices"]
+        if prepared_catalog is not None
+        else triangle_seed_indices_for_catalog(catalog_magnitudes)
+    )
+    image_seed_indices = triangle_seed_indices_for_stars(candidate_stars(stars, MAX_CANDIDATE_STARS))
+    image_triangles = iter_triangle_indices(len(image_seed_indices))
 
     best_score = 0.0
     best_transform = None
@@ -269,29 +326,70 @@ def evaluate_catalog_entry(
     best_matched_count = 0
 
     for catalog_triangle in catalog_triangles:
-        catalog_signature = triangle_signature(catalog_norm, catalog_triangle)
+        mapped_catalog_triangle = tuple(catalog_seed_indices[index] for index in catalog_triangle)
+        catalog_signature = triangle_signature(catalog_norm, mapped_catalog_triangle)
         for image_triangle in image_triangles:
-            image_norm = normalize_points(image_points[list(image_triangle)])
+            mapped_image_triangle = tuple(image_seed_indices[index] for index in image_triangle)
+            image_norm = normalize_points(image_points[list(mapped_image_triangle)])
             image_signature = triangle_signature(image_norm, (0, 1, 2))
             if np.linalg.norm(catalog_signature - image_signature) > TRIANGLE_SIGNATURE_DISTANCE_LIMIT:
                 continue
 
             model, inliers = estimate_affine_transform(
                 catalog_norm,
-                catalog_triangle,
+                mapped_catalog_triangle,
                 image_points,
-                image_triangle,
+                mapped_image_triangle,
             )
             if model is None or inliers is None:
                 continue
 
             transformed = model(catalog_norm)
-            score, geometric_score, coverage, brightness_score, matched_star_count = score_catalog_alignment(
+            (
+                score,
+                geometric_score,
+                coverage,
+                brightness_score,
+                matched_star_count,
+                matched_catalog_indices,
+                matched_detected_indices,
+            ) = score_catalog_alignment(
                 transformed,
                 image_points,
                 catalog_magnitudes,
                 detected_brightness,
             )
+
+            if matched_star_count >= 3:
+                refined_model = SimilarityTransform.from_estimate(
+                    catalog_norm[matched_catalog_indices],
+                    image_points[matched_detected_indices],
+                )
+                if refined_model is not None:
+                    refined_transformed = refined_model(catalog_norm)
+                    (
+                        refined_score,
+                        refined_geometric_score,
+                        refined_coverage,
+                        refined_brightness_score,
+                        refined_matched_star_count,
+                        _,
+                        _,
+                    ) = score_catalog_alignment(
+                        refined_transformed,
+                        image_points,
+                        catalog_magnitudes,
+                        detected_brightness,
+                    )
+                    if refined_score >= score:
+                        model = refined_model
+                        transformed = refined_transformed
+                        score = refined_score
+                        geometric_score = refined_geometric_score
+                        coverage = refined_coverage
+                        brightness_score = refined_brightness_score
+                        matched_star_count = refined_matched_star_count
+
             score = (score * 0.85) + (soft_compatibility * 0.15)
 
             if score > best_score:
@@ -305,6 +403,7 @@ def evaluate_catalog_entry(
     transformed_full = best_transform(catalog_norm).tolist() if best_transform is not None else []
     accepted = (
         best_transform is not None
+        and best_matched_count >= required_matched_star_count(len(catalog_entry["stars"]))
         and best_score >= MIN_MATCH_SCORE
         and best_coverage >= MIN_MATCH_COVERAGE
         and (
@@ -315,6 +414,8 @@ def evaluate_catalog_entry(
     if not accepted and rejection_reason is None:
         if best_transform is None:
             rejection_reason = "no_alignment"
+        elif best_matched_count < required_matched_star_count(len(catalog_entry["stars"])):
+            rejection_reason = "too_few_matched_stars"
         elif best_score < MIN_MATCH_SCORE:
             rejection_reason = "low_score"
         elif best_coverage < MIN_MATCH_COVERAGE:
